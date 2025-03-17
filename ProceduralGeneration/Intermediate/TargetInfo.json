@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "ProceduralGeneration",
+			"Path": "..\\Source\\ProceduralGeneration.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "ProceduralGenerationEditor",
+			"Path": "..\\Source\\ProceduralGenerationEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}

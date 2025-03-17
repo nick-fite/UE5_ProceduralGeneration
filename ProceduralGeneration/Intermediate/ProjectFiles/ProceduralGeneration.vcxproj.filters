@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="..\..\ProceduralGeneration.uproject" />
+    <Filter Include="Source">
+      <UniqueIdentifier>{F31BBDD1-B3E8-3BCC-9652-680E16935819}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\ProceduralGeneration.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\Source\ProceduralGenerationEditor.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <Filter Include="Config">
+      <UniqueIdentifier>{FA535FFB-25E1-3D20-B416-52F9BE21E06E}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\DefaultEditor.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEngine.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultGame.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultInput.ini">
+      <Filter>Config</Filter>
+    </None>
+    <Filter Include="Source\ProceduralGeneration">
+      <UniqueIdentifier>{AA18EBB2-DC3C-318B-BF2A-E4CA2CAFF3E0}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\ProceduralGeneration\ProceduralGeneration.Build.cs">
+      <Filter>Source\ProceduralGeneration</Filter>
+    </None>
+    <ClCompile Include="..\..\Source\ProceduralGeneration\ProceduralGeneration.cpp">
+      <Filter>Source\ProceduralGeneration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ProceduralGeneration\ProceduralGeneration.h">
+      <Filter>Source\ProceduralGeneration</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

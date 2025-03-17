@@ -1,0 +1,13 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-ProceduralGeneration.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"C:\Users\nfite\Desktop\UE5_ProceduralGeneration\ProceduralGeneration\Intermediate\Build\Win64\x64\ProceduralGenerationEditor\Development\UnrealEd\SharedPCH.UnrealEd.Project.ValApi.Cpp20.h.obj"
+"C:\Users\nfite\Desktop\UE5_ProceduralGeneration\ProceduralGeneration\Intermediate\Build\Win64\x64\UnrealEditor\Development\ProceduralGeneration\ProceduralGeneration.cpp.obj"
+"C:\Users\nfite\Desktop\UE5_ProceduralGeneration\ProceduralGeneration\Intermediate\Build\Win64\x64\UnrealEditor\Development\ProceduralGeneration\PerModuleInline.gen.cpp.obj"
+"C:\Users\nfite\Desktop\UE5_ProceduralGeneration\ProceduralGeneration\Intermediate\Build\Win64\x64\UnrealEditor\Development\ProceduralGeneration\Default.rc2.res"
+/OUT:"C:\Users\nfite\Desktop\UE5_ProceduralGeneration\ProceduralGeneration\Intermediate\Build\Win64\x64\UnrealEditor\Development\ProceduralGeneration\UnrealEditor-ProceduralGeneration.lib"
