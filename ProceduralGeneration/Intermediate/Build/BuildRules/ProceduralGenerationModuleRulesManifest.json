@@ -1,8 +1,0 @@
-{
-	"SourceFiles": [
-		"C:\\Users\\nfite\\Desktop\\UE5_ProceduralGeneration\\ProceduralGeneration\\Source\\ProceduralGeneration\\ProceduralGeneration.Build.cs",
-		"C:\\Users\\nfite\\Desktop\\UE5_ProceduralGeneration\\ProceduralGeneration\\Source\\ProceduralGeneration.Target.cs",
-		"C:\\Users\\nfite\\Desktop\\UE5_ProceduralGeneration\\ProceduralGeneration\\Source\\ProceduralGenerationEditor.Target.cs"
-	],
-	"EngineVersion": "5.5.4"
-}
