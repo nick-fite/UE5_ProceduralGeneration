@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "MarchingCube.generated.h"
 
+
+
 UCLASS()
 class AMarchingCube : public AActor
 {
@@ -33,17 +35,25 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Marching Cubes")
 	bool Interpolation = false;
 
+	float Frequency;
+
+	UPROPERTY(EditAnywhere)
+	int Size = 64;
 private:
 	TArray<float> Voxels;
 	int TriangleOrder[3] = {0,1,2};
 
 	UPROPERTY(EditAnywhere)
-	int Size = 64;
-	
+	int VertexCount = 80;
+
+	TArray<FVector> Vertices;
+	TArray<const int*> Triangles;
+	TArray<FVector> Normals;
+
 
 	void March(int X, int Y, int Z, const float Cube[8]);
 
-	int getVoxelIndex(int X, int Y, int Z) const;
+	int GetVoxelIndex(int X, int Y, int Z) const;
 	float GetInterpolationOffset(float V1, float V2) const;
 	
 	

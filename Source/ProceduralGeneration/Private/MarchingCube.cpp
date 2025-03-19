@@ -24,15 +24,13 @@ void AMarchingCube::GenerateHeightMap()
 {
 	const FVector Pos = GetActorLocation() / 100;
 
-	for (int x = 0; x <= Size; x++)
+	for (int x = 0; x <= Size; ++x)
 	{
-		
-		for (int y = 0; y <= Size; y++)
+		for (int y = 0; y <= Size; ++y)
 		{
-			for (int z = 0; z <= Size; z++)
+			for (int z = 0; z <= Size; ++z)
 			{
-				Voxels[getVoxelIndex(x,y,z)] = FMath::PerlinNoise3D(FVector(x + Pos.X, y + Pos.Y, z + Pos.Z));
-		
+				Voxels[GetVoxelIndex(x,y,z)] = FMath::PerlinNoise3D(FVector(x + Pos.X, y + Pos.Y, z + Pos.Z));
 			}
 		}
 	}
@@ -52,6 +50,23 @@ void AMarchingCube::GenerateMesh()
 		TriangleOrder[1] = 1;
 		TriangleOrder[2] = 0;
 	}
+
+	float Cube[8];
+	for(int x = 0; x < Size; ++x)
+	{
+		for(int y = 0; y < Size; ++y)
+		{
+			for(int z = 0; z < Size; ++z)
+			{
+				for(int i = 0; i < 8; ++i)
+				{
+					Cube[i] = Voxels[GetVoxelIndex(x + VertexOffset[i][0], y + VertexOffset[i][1], z + VertexOffset[i][2])];
+				}
+				March(x,y,z, Cube);
+		
+			}
+		}
+	}
 	
 }
 
@@ -62,8 +77,67 @@ void AMarchingCube::Tick(float DeltaTime)
 
 }
 
-int AMarchingCube::getVoxelIndex(int X, int Y, int Z) const
+void AMarchingCube::March(int X, int Y, int Z, const float Cube[8])
+{
+	int vertexMask = 0;
+	FVector EdgeVertex[12];
+	for(int i = 0; i < 8; ++i)
+	{
+		if(Cube[i] <= SurfaceLevel) vertexMask |= 1 << i;
+	}
+
+	const int EdgeMask = CubeEdgeFlags[vertexMask];
+
+	if (EdgeMask == 0) return;
+
+	for(int i = 0; i < 12; ++i)
+	{
+		if((EdgeMask & 1 << i) != 0)
+		{
+			const float Offset = Interpolation ? GetInterpolationOffset(Cube[EdgeConnection[i][0]], Cube[EdgeConnection[i][1]]) : 0.5;
+
+			EdgeVertex[i].X = X + (VertexOffset[EdgeConnection[i][0]][0] + Offset * EdgeDirection[i][0]);
+			EdgeVertex[i].Y = Y + (VertexOffset[EdgeConnection[i][0]][1] + Offset * EdgeDirection[i][1]);
+			EdgeVertex[i].Z = Z + (VertexOffset[EdgeConnection[i][0]][2] + Offset * EdgeDirection[i][2]);
+		}
+	}
+
+	for(int i = 0; i < 5; ++i)
+	{
+		if(TriangleConnectionTable[vertexMask][3 * i] < 0) break;
+
+		FVector V1 = EdgeVertex[TriangleConnectionTable[vertexMask][3 * i]] * 100;
+		FVector V2 = EdgeVertex[TriangleConnectionTable[vertexMask][3 * i + 1]] * 100;
+		FVector V3 = EdgeVertex[TriangleConnectionTable[vertexMask][3 * i + 2]] * 100;
+
+		FVector Normal = FVector::CrossProduct(V2 - V1, V3 - V1);
+		Normal.Normalize();
+
+		Vertices.Add(V1);
+		Vertices.Add(V2);
+		Vertices.Add(V3);
+
+		Triangles.Add(VertexCount + TriangleConnectionTable[0]);
+		Triangles.Add(VertexCount + TriangleConnectionTable[1]);
+		Triangles.Add(VertexCount + TriangleConnectionTable[2]);
+
+		Normals.Add(Normal);
+		Normals.Add(Normal);
+		Normals.Add(Normal);
+
+		VertexCount += 3;
+	}
+	
+}
+
+int AMarchingCube::GetVoxelIndex(int X, int Y, int Z) const
 {
 	return Z * (Size + 1) * (Size + 1) + Y * (Size + 1) + X; 
+}
+
+float AMarchingCube::GetInterpolationOffset(float V1, float V2) const
+{
+	const float Delta = V1 - V2;
+	return Delta == 0.f ? SurfaceLevel : (SurfaceLevel -V1) / Delta;
 }
 
