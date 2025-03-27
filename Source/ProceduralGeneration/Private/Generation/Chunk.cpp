@@ -153,3 +153,10 @@ void AChunk::ApplyMesh() const
 	Mesh->CreateMeshSection(0, Vertices, Triangles, TArray<FVector>(), UVData, TArray<FColor>(), TArray<FProcMeshTangent>(), true);
 }
 
+void AChunk::Regenerate()
+{
+	GenerateBlocks();
+	GenerateMesh();
+	ApplyMesh();
+}
+

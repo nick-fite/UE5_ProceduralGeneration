@@ -74,4 +74,8 @@ private:
 	void GenerateBlocks();
 	void GenerateMesh();
 	void ApplyMesh() const;
+	
+
+	UFUNCTION(CallInEditor, Category = "Chunk")
+	void Regenerate();
 };
