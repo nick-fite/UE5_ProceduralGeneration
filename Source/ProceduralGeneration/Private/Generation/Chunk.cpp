@@ -4,6 +4,7 @@
 
 #include "ProceduralGeneration/BlocksEnum.h"
 #include "ProceduralGeneration/DirectionEnum.h"
+#include "Subsystems/SubsystemBlueprintLibrary.h"
 
 // Sets default values
 AChunk::AChunk()
@@ -13,7 +14,7 @@ AChunk::AChunk()
 
 	Mesh = CreateDefaultSubobject<UProceduralMeshComponent>("Mesh");
 	RootComponent = Mesh;
-	Blocks.SetNum(Size * Size * Size);
+	//Blocks.SetNum(Size * Size * Size);
 	Mesh->SetCastShadow(false);
 	
 }
@@ -24,7 +25,8 @@ void AChunk::BeginPlay()
 	Super::BeginPlay();
 
 	UE_LOG(LogTemp, Warning, TEXT("AChunk::BeginPlay"));
-	GenerateBlocks();
+	Blocks.SetNum(Size * Size * Size);
+	GenerateCave();
 	GenerateMesh();
 	ApplyMesh();
 	
@@ -88,7 +90,7 @@ int AChunk::GetBlockIndex(int X, int Y, int Z) const
 	return Z * Size * Size + Y * Size + X;
 }
 
-void AChunk::GenerateBlocks()
+void AChunk::GenerateCave()
 {
 	UE_LOG(LogTemp, Warning, TEXT("AChunk::GenerateBlocks"));
 	const FVector Loc = GetActorLocation();
@@ -96,28 +98,34 @@ void AChunk::GenerateBlocks()
 	{
 		for (int y = 0; y < Size; ++y)
 		{
-			const float XPos = x / 100.f;
-			const float YPos = y / 100.f;
+			for (int z = 0; z < Size; ++z)
+			{
+				const float XPos = x + .1f + Loc.X;
+				const float YPos = y + .1f + Loc.Y;
+				const float ZPos = z + .1f + Loc.Z;
+
+				const int val = FMath::Clamp(FMath::RoundToInt((FMath::PerlinNoise3D(FVector(XPos * .1, YPos * .1, ZPos * .1)) + 1) * Size / 2), 0, Size);
+				UE_LOG(LogTemp, Warning, TEXT("%f , %f: Block %d"), XPos, YPos, val);
+				if (val > Size/2)
+					Blocks[GetBlockIndex(x,y,z)] = EBlock::Stone;
+				else
+					Blocks[GetBlockIndex(x,y,z)] = EBlock::Air;
+			}
+			/*const float XPos = x + .1f + Loc.X;
+			const float YPos = y + .1f + Loc.Y;
 
 			UE_LOG(LogTemp, Warning, TEXT("X: %f, Y: %f"), XPos, YPos);
 
-			//const int Height = FMath::Clamp(FMath::RoundToInt(FMath::PerlinNoise2D(FVector2D(XPos, YPos)  + 1 ) * Size / 2 ), 0.f, Size);
-			float noiseVal = FMath::PerlinNoise2D(FVector2D(XPos, YPos));
-			float modifiedNoiseVal = FMath::RoundToInt(noiseVal * Size / 2);
-			const int Height = FMath::Clamp(modifiedNoiseVal, 0, Size);
-			UE_LOG(LogTemp, Warning, TEXT("NoiseVal: %f"), noiseVal);
-			UE_LOG(LogTemp, Warning, TEXT("ModifiedNoiseVal: %f"), modifiedNoiseVal);
+			const int Height = FMath::Clamp(FMath::RoundToInt((FMath::PerlinNoise3D(FVector(XPos, YPos, 0)) + 1) * Size / 2), 0, Size);
 			UE_LOG(LogTemp, Warning, TEXT("Height: %d"), Height);
 
-			for (int z = 0; z < Height; z++)
+			for (int z = 0; z < Size; z++)
 			{
-				Blocks[GetBlockIndex(x,y,z)] = EBlock::Stone;
-			}
-
-			for (int z = Height; z < Size; z++)
-			{
-				Blocks[GetBlockIndex(x,y,z)] = EBlock::Air;
-			}
+				if (z < Height)
+					Blocks[GetBlockIndex(x,y,z)] = EBlock::Stone;
+				else
+					Blocks[GetBlockIndex(x,y,z)] = EBlock::Air;
+			}*/
 		}
 	}
 }
@@ -155,7 +163,10 @@ void AChunk::ApplyMesh() const
 
 void AChunk::Regenerate()
 {
-	GenerateBlocks();
+	VertextCount = 0;
+	Vertices = TArray<FVector>();
+	Mesh->ClearMeshSection(0);
+	GenerateCave();
 	GenerateMesh();
 	ApplyMesh();
 }

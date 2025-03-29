@@ -71,7 +71,7 @@ private:
 	FVector GetPositionInDirection(FVector Pos, EDirection Dir);
 	//FVector GetNormal(FVector Pos);
 	int GetBlockIndex(int X, int Y, int Z) const;
-	void GenerateBlocks();
+	void GenerateCave();
 	void GenerateMesh();
 	void ApplyMesh() const;
 	
