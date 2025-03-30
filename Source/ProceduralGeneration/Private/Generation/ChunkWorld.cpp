@@ -12,8 +12,11 @@ AChunkWorld::AChunkWorld()
 	PrimaryActorTick.bCanEverTick = true;
 
 	//random seed for biomes
-	NoiseGenerator.BaseSeed = 2352;
-	NoiseGenerator.Frequency = TerrainPerlinNoiseFrequency;
+	BiomeNoiseGenerator.BaseSeed = 2352;
+	BiomeNoiseGenerator.Frequency = PlaneNoiseFrequency;
+
+	StructureNoiseGenerator.BaseSeed = 5634;
+	StructureNoiseGenerator.Frequency = PlaneNoiseFrequency;
 }
 
 // Called when the game starts or when spawned
@@ -32,30 +35,34 @@ void AChunkWorld::BeginPlay()
 
 			AChunk* chunk = GetWorld()->SpawnActorDeferred<AChunk>(AChunk::StaticClass(), Transform, this);
 			
-			const float height = NoiseGenerator.GetNoise(x * Size * 100,y * Size * 100);
+			const float height = BiomeNoiseGenerator.GetNoise(x * Size,y * Size);
 			if (height >= -1 && height <= -0.5)
 			{
 				UE_LOG(LogTemp, Display, TEXT("Snow"));
 				chunk->Biome = EBiome::Snow;
 				chunk->Material = SnowMaterial;
+				chunk->TerrainPerlinNoiseFrequency = SnowNoiseFrequency;
 			}
 			else if (height > -0.5 && height <= 0)
 			{
 				UE_LOG(LogTemp, Display, TEXT("Planes"));
 				chunk->Biome = EBiome::PLanes;
 				chunk->Material = PlaneMaterial;
+				chunk->TerrainPerlinNoiseFrequency = PlaneNoiseFrequency;
 			}
 			else if (height > 0 && height <= 0.5)
 			{
 				UE_LOG(LogTemp, Display, TEXT("Forest"));
 				chunk->Biome = EBiome::Forest;
 				chunk->Material = ForestMaterial;
+				chunk->TerrainPerlinNoiseFrequency = ForestNoiseFrequency;
 			}
 			else
 			{
 				UE_LOG(LogTemp, Display, TEXT("Desert"));
 				chunk->Biome = EBiome::Desert;
 				chunk->Material = DesertMaterial;
+				chunk->TerrainPerlinNoiseFrequency = DesertNoiseFrequency;
 			}
 			
 			UE_LOG(LogTemp, Warning, TEXT("Chunk created, changing size"));
@@ -63,7 +70,6 @@ void AChunkWorld::BeginPlay()
 			chunk->Size = Size;
 			chunk->HeightMulti = heightMulti;
 			chunk->Scale = Scale;
-			chunk->TerrainPerlinNoiseFrequency = TerrainPerlinNoiseFrequency;
 
 			// Finish spawning the actor on the game thread
 			AsyncTask(ENamedThreads::GameThread, [chunk, Transform]()

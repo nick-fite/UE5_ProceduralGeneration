@@ -37,8 +37,16 @@ private:
 	float heightMulti = 1;
 	UPROPERTY(EditAnywhere, Category = "Chunk")
 	int Scale = 1;
+
+	
 	UPROPERTY(EditAnywhere, Category = "Chunk")
-	float TerrainPerlinNoiseFrequency = .01;
+	float PlaneNoiseFrequency = .008;
+	UPROPERTY(EditAnywhere, Category = "Chunk")
+	float DesertNoiseFrequency = .006;
+	UPROPERTY(EditAnywhere, Category = "Chunk")
+	float SnowNoiseFrequency = .01;
+	UPROPERTY(EditAnywhere, Category = "Chunk")
+	float ForestNoiseFrequency = .02;
 
 	UPROPERTY(EditDefaultsOnly, Category="Chunk")
 	TObjectPtr<UMaterial> DesertMaterial;
@@ -54,6 +62,7 @@ private:
 
 	int32 TestFunc();
 	
-	CustomPerlin::FNoiseGenerator2D NoiseGenerator;
+	CustomPerlin::FNoiseGenerator2D BiomeNoiseGenerator;
+	CustomPerlin::FNoiseGenerator2D StructureNoiseGenerator;
 };
 
