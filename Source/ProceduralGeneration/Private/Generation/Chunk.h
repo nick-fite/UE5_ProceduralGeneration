@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ProceduralMeshComponent.h"
+#include "Utils/CustomPerlin.h"
 #include "Chunk.generated.h"
+
 
 enum class EDirection;
 enum class EBlock;
@@ -14,6 +16,12 @@ UCLASS()
 class AChunk : public AActor
 {
 	GENERATED_BODY()
+
+	struct FMask
+	{
+		EBlock Block;
+		int Normal;
+	};
 	
 public:	
 	// Sets default values for this actor's properties
@@ -27,23 +35,36 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-private:
+/********************/
+/*    chunk vals    */
+/********************/
+public:
 	UPROPERTY(EditDefaultsOnly, Category = "Chunk")
 	int32 Size = 32;
 	UPROPERTY(EditDefaultsOnly, Category = "Chunk")
 	int Scale = 1;
+	UPROPERTY(EditDefaultsOnly, Category = "Chunk")
+	float TerrainPerlinNoiseFrequency = .01;
+	UPROPERTY(EditDefaultsOnly, Category = "Chunk")
+	float HeightMulti = 1;
 
+private:
 	UPROPERTY()
 	UProceduralMeshComponent* Mesh;
-	TArray<EBlock> Blocks;
+	TArray<EBlock> CaveBlocks;
+	TArray<EBlock> TerrainBlocks;
 	UPROPERTY()
 	TArray<FVector> Vertices;
 	UPROPERTY()
 	TArray<int32> Triangles;
 	UPROPERTY()
 	TArray<FVector2D> UVData;
+	UPROPERTY()
+	TArray<FColor> Colors;
 
-	int VertextCount = 0;
+	CustomPerlin::FNoiseGenerator2D NoiseGenerator2D;
+
+	int VertexCount = 0;
 
 	const FVector BlockVertexData[8] = {
 		FVector(100,100,100),
@@ -65,17 +86,20 @@ private:
 		3,2,7,6  // Down
 	};
 
-	bool Check(FVector Pos) const;
+	EBlock GetBlock(FVector Pos) const;
 	void CreateFace(EDirection Dir, const FVector& Pos);
 	TArray<FVector> GetFaceVertices(EDirection Dir, const FVector& Pos) const;
 	FVector GetPositionInDirection(FVector Pos, EDirection Dir);
-	//FVector GetNormal(FVector Pos);
 	int GetBlockIndex(int X, int Y, int Z) const;
 	void GenerateCave();
-	void GenerateMesh();
+	void GenerateTerrain();
+	void GenerateMesh(TArray<EBlock> BlocksToGenerate, int ZOffset, bool UseMaxHeight);
 	void ApplyMesh() const;
-	
 
-	UFUNCTION(CallInEditor, Category = "Chunk")
-	void Regenerate();
+	void Generate();
+
+	//Multithreading :)
+	TAtomic<int32> GenerationsCompleted = TAtomic(0);
+	int32 TotalGenerations = 4; //we have 4 rounds of generation, if we add more we'll increase this
+	void CheckGenerationCompleted() const;
 };
