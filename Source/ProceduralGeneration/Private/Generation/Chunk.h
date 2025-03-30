@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ProceduralMeshComponent.h"
+#include "ProceduralGeneration/BiomesEnum.h"
 #include "Utils/CustomPerlin.h"
 #include "Chunk.generated.h"
 
@@ -47,6 +48,10 @@ public:
 	float TerrainPerlinNoiseFrequency = .01;
 	UPROPERTY(EditDefaultsOnly, Category = "Chunk")
 	float HeightMulti = 1;
+	UPROPERTY(EditDefaultsOnly, Category = "Chunk")
+	TObjectPtr<UMaterialInterface> Material;
+	
+	EBiome Biome = EBiome::PLanes;
 
 private:
 	UPROPERTY()
@@ -61,6 +66,8 @@ private:
 	TArray<FVector2D> UVData;
 	UPROPERTY()
 	TArray<FColor> Colors;
+	UPROPERTY()
+	TArray<FVector> Normals;
 
 	CustomPerlin::FNoiseGenerator2D NoiseGenerator2D;
 
@@ -86,20 +93,27 @@ private:
 		3,2,7,6  // Down
 	};
 
-	EBlock GetBlock(FVector Pos) const;
+	EBlock GetBlock(TArray<EBlock> Blocks, FIntVector Pos) const;
 	void CreateFace(EDirection Dir, const FVector& Pos);
 	TArray<FVector> GetFaceVertices(EDirection Dir, const FVector& Pos) const;
 	FVector GetPositionInDirection(FVector Pos, EDirection Dir);
 	int GetBlockIndex(int X, int Y, int Z) const;
 	void GenerateCave();
 	void GenerateTerrain();
-	void GenerateMesh(TArray<EBlock> BlocksToGenerate, int ZOffset, bool UseMaxHeight);
+	void GenerateMesh(const TArray<EBlock>& BlocksToGenerate, int ZOffset, bool UseMaxHeight);
 	void ApplyMesh() const;
 
 	void Generate();
+
+	//Greedy
+	bool CompareMask(const FMask M1, const FMask M2) const;
+	void CreateQuad(FMask Mask, FIntVector AxisMask, int Width, int Height, FIntVector V1, FIntVector V2, FIntVector V3, FIntVector V4, int ZOffset, bool UseHeightMult);
+	
 
 	//Multithreading :)
 	TAtomic<int32> GenerationsCompleted = TAtomic(0);
 	int32 TotalGenerations = 4; //we have 4 rounds of generation, if we add more we'll increase this
 	void CheckGenerationCompleted() const;
+
+	int GetTextureIndex(EBlock BlockType) const;
 };

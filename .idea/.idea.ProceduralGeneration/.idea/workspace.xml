@@ -14,13 +14,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="14fcaac2-feb1-424c-8609-4270bcc6fd2c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Source/ProceduralGeneration/Private/Utils/CustomPerlin.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/ProceduralGeneration/Private/Utils/FastNoiseLite.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/ProceduralGeneration/BiomesEnum.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ProceduralGeneration/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProceduralGeneration/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Level/BP_Chunk.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Level/BP_Chunk.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Generation/BP_Chunk.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Generation/BP_Chunk.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Generation/BP_ChunkWorld.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Generation/BP_ChunkWorld.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Level/TestLevel.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Level/TestLevel.umap" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProceduralGeneration/Private/Generation/Chunk.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProceduralGeneration/Private/Generation/Chunk.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProceduralGeneration/Private/Generation/Chunk.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProceduralGeneration/Private/Generation/Chunk.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProceduralGeneration/Private/Generation/ChunkWorld.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProceduralGeneration/Private/Generation/ChunkWorld.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProceduralGeneration/Private/Generation/ChunkWorld.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProceduralGeneration/Private/Generation/ChunkWorld.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,8 +46,10 @@
     <setting file="file://$PROJECT_DIR$/../../../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Core/Public/Templates/Function.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Core/Public/Templates/FunctionFwd.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Core/Public/Windows/WindowsPlatform.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Core/Tests/String/SplitTest.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/CoreUObject/Public/Serialization/DerivedData.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/Engine/Private/GameplayStatics.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../../../Program Files/Epic Games/UE_5.5/Engine/Source/Runtime/SymsLib/syms/core/data_structures/syms_data_structures.c" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/ProceduralGeneration/Private/Generation/Chunk.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/ProceduralGeneration/Private/Generation/Chunk.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/ProceduralGeneration/Private/Generation/ChunkWorld.cpp" root0="FORCE_HIGHLIGHTING" />
@@ -231,7 +235,7 @@
       <workItem from="1743110850747" duration="1911000" />
       <workItem from="1743202118441" duration="444000" />
       <workItem from="1743203026867" duration="8252000" />
-      <workItem from="1743259423148" duration="41412000" />
+      <workItem from="1743259423148" duration="60713000" />
     </task>
     <servers />
   </component>

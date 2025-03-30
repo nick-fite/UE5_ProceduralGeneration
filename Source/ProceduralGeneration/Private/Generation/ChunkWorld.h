@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Utils/CustomPerlin.h"
 #include "ChunkWorld.generated.h"
 
 class AChunk;
@@ -39,9 +40,20 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Chunk")
 	float TerrainPerlinNoiseFrequency = .01;
 
+	UPROPERTY(EditDefaultsOnly, Category="Chunk")
+	TObjectPtr<UMaterial> DesertMaterial;
+	UPROPERTY(EditDefaultsOnly, Category="Chunk")
+	TObjectPtr<UMaterial> PlaneMaterial;
+	UPROPERTY(EditDefaultsOnly, Category="Chunk")
+	TObjectPtr<UMaterial> ForestMaterial;
+	UPROPERTY(EditDefaultsOnly, Category="Chunk")
+	TObjectPtr<UMaterial> SnowMaterial;
+
 	UFUNCTION()
 	void StartGen(AChunk* chunk, const FTransform& Transform);
 
 	int32 TestFunc();
+	
+	CustomPerlin::FNoiseGenerator2D NoiseGenerator;
 };
 
