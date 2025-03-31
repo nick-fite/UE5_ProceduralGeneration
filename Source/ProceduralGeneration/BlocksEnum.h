@@ -2,9 +2,10 @@
 
 enum class EBlock
 {
-	Null,
-	Air,
+	Null ,
+	Air ,
 	Stone,
 	Dirt,
-	Grass
+	Grass,
+	Structure,
 };

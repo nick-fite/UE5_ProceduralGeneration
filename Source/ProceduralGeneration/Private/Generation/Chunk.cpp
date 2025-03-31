@@ -4,6 +4,7 @@
 
 #include "ProceduralGeneration/BlocksEnum.h"
 #include "ProceduralGeneration/DirectionEnum.h"
+#include "ProceduralGeneration/StructurePositions.h"
 #include "Utils/CustomPerlin.h"
 
 // Sets default values
@@ -25,7 +26,8 @@ void AChunk::BeginPlay()
 
 	//UE_LOG(LogTemp, Warning, TEXT("AChunk::BeginPlay"));
 
-	NoiseGenerator2D.Frequency = TerrainPerlinNoiseFrequency;
+	NoiseGenerator.Frequency = TerrainPerlinNoiseFrequency;
+	NoiseGenerator.BaseSeed = TerrainSeed;
 
 	Generate();
 }
@@ -101,6 +103,14 @@ void AChunk::GenerateCave()
 				const int val = FMath::Clamp(
 					FMath::RoundToInt((FMath::PerlinNoise3D(FVector(XPos * .1, YPos * .1, ZPos * .1)) + 1) * Size / 2),
 					0, Size);
+
+				//makes cave floor
+				if (z == 0)
+				{
+					CaveBlocks[GetBlockIndex(x, y, z)] = EBlock::Stone;
+					continue;
+				}
+				
 				//UE_LOG(LogTemp, Warning, TEXT("%f , %f: Block %d"), XPos, YPos, val);
 				if (val > Size / 2)
 					CaveBlocks[GetBlockIndex(x, y, z)] = EBlock::Stone;
@@ -126,18 +136,34 @@ void AChunk::GenerateTerrain()
 
 			//UE_LOG(LogTemp, Warning, TEXT("X: %f, Y: %f"), XPos, YPos);
 
-			const int Height = FMath::Clamp(FMath::RoundToInt((NoiseGenerator2D.GetNoise(XPos, YPos) + 1) * MaxHeight / 2),
+			int Height = FMath::Clamp(FMath::RoundToInt((NoiseGenerator.GetNoise(XPos, YPos) + 1) * MaxHeight / 2),
 			                                0, MaxHeight);
 
-			//UE_LOG(LogTemp, Warning, TEXT("Height: %d"), Height);
 
-			for (int z = 0; z < MaxHeight; z++)
+			float structure = FMath::RandRange(0.1, 1.0);
+			//UE_LOG(LogTemp, Warning, TEXT("%f"), structure);
+			
+			if (structure > .999f)
+			{
+				for (int z = 0; z < MaxHeight; ++z)
+				{
+					TerrainBlocks[GetBlockIndex(x,y,z)]	= EBlock::Structure;
+					
+				}
+				continue;
+			}
+
+			for (int z = 0; z < Size; z++)
 			{
 				if (z < Height)
 				{
 					if (z == Height - 1)
 					{
 						TerrainBlocks[GetBlockIndex(x, y, z)] = EBlock::Grass;
+					}
+					else if (z < 3)
+					{
+						TerrainBlocks[GetBlockIndex(x, y, z)] = EBlock::Stone;
 					}
 					else
 					{
@@ -148,6 +174,7 @@ void AChunk::GenerateTerrain()
 				else
 					TerrainBlocks[GetBlockIndex(x, y, z)] = EBlock::Air;
 			}
+			
 		}
 	}
 }
@@ -155,40 +182,82 @@ void AChunk::GenerateTerrain()
 void AChunk::GenerateMesh(const TArray<EBlock>& BlocksToGenerate, int ZOffset, bool UseMaxHeight)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("AChunk::GenerateMesh"));
+	//loops through all the axes
 	for (int Axis = 0; Axis < 3; ++Axis)
 	{
+		//gets the other axes
 		const int Axis1 = (Axis + 1) % 3;
 		const int Axis2 = (Axis + 2) % 3;
 
-		const int MainAxisLimit = Size;
-		const int Axis1Limit = Size;
-		const int Axis2Limit = Size;
+		/*
+		 * order axises are called:
+			In a nutshell:
+			When Axis = 0 (x is the Main Axis):
+			Axis1 = y
+			Axis2 = z
 
+			When Axis = 1 (y is the Main Axis):
+			Axis1 = z
+			Axis2 = x
+
+			When Axis = 2 (z is the Main Axis):
+			Axis1 = x
+			Axis2 = y
+		 */
+		
+
+		//defines the limit for each axis
+		int MainAxisLimit = Size;
+		int Axis1Limit = Size;
+		int Axis2Limit = Size;
+
+		//increase the axis in Z direction if needed
+		if (Axis == 0)
+		{
+			Axis2Limit *= (UseMaxHeight ? HeightMulti : 1);
+		}
+		else if (Axis == 1)
+		{
+			Axis1Limit *= (UseMaxHeight ? HeightMulti : 1);
+		}
+		else if (Axis == 2)
+		{
+			MainAxisLimit *= (UseMaxHeight ? HeightMulti : 1);
+		}
+		
+
+		//stores displacement of vectors
 		FIntVector DeltaAxis1 = FIntVector::ZeroValue;
 		FIntVector DeltaAxis2 = FIntVector::ZeroValue;
 
+		//used to traverse the grid
 		FIntVector ChunkItr = FIntVector(0,0, 0);
+		//used to shift to different axis
 		FIntVector AxisMask = FIntVector::ZeroValue;
-
+		//set it to the first one
 		AxisMask[Axis] = 1;
-
+		//holds the region of the grid
 		TArray<FMask> Mask;
-		Mask.SetNum(Axis1Limit * Axis2Limit);
+		Mask.SetNum(Axis1Limit * Axis2Limit * MainAxisLimit);
 
+		// start looping
 		for (ChunkItr[Axis] =  -1; ChunkItr[Axis] < MainAxisLimit;)
 		{
 			int N = 0;
-
+			//goes through the other 2 axes
 			for (ChunkItr[Axis2] = 0; ChunkItr[Axis2] < Axis2Limit; ++ChunkItr[Axis2])
 			{
 				for (ChunkItr[Axis1] = 0; ChunkItr[Axis1] < Axis1Limit; ++ChunkItr[Axis1])
 				{
+					//gets the block and the block in the axis mask direction
 					const auto CurrentBlock = GetBlock(BlocksToGenerate, ChunkItr);
 					const auto CompareBlock = GetBlock(BlocksToGenerate, ChunkItr + AxisMask);
 
+					//checks to see if they're being blocked
 					const bool CurrentBlockOpaque = CurrentBlock != EBlock::Air;
 					const bool CompareBlockOpaque = CompareBlock != EBlock::Air;
 
+					//if they're both the same set it to null, if it's not keep the data
 					if (CurrentBlockOpaque == CompareBlockOpaque)
 					{
 						Mask[N++] = FMask{EBlock::Null, 0};
@@ -203,11 +272,14 @@ void AChunk::GenerateMesh(const TArray<EBlock>& BlocksToGenerate, int ZOffset, b
 					}
 				}
 			}
-		
+
+			//up 1
 			++ChunkItr[Axis];
+			//reset
 			N = 0;
+
 			
-			for (int j = 0; j < Axis2Limit; ++j)
+			for (int j = 0; j < Axis2Limit*(UseMaxHeight ? HeightMulti : 1); ++j)
 			{
 				for (int i = 0; i < Axis1Limit;)
 				{
@@ -311,6 +383,11 @@ void AChunk::ApplyMesh() const
 {
 	//UE_LOG(LogTemp, Warning, TEXT("AChunk::ApplyMesh"));
 	Mesh->SetMaterial(0, Material);
+	UE_LOG(LogTemp, Warning, TEXT("Vertices: %d"), Vertices.Num());
+	UE_LOG(LogTemp, Warning, TEXT("Triangles: %d"), Triangles.Num());
+	UE_LOG(LogTemp, Warning, TEXT("Normals: %d"), Normals.Num());
+	UE_LOG(LogTemp, Warning, TEXT("UVData: %d"), UVData.Num());
+	UE_LOG(LogTemp, Warning, TEXT("Color: %d"), Colors.Num());
 	Mesh->CreateMeshSection(0, Vertices, Triangles, Normals, UVData, Colors, TArray<FProcMeshTangent>(),
 	                        true);
 }
@@ -354,7 +431,7 @@ void AChunk::Generate()
 	});
 	AsyncTask(ENamedThreads::GameThread, [this]()
 	{
-		GenerateMesh(TerrainBlocks, Size, true);
+		GenerateMesh(TerrainBlocks, Size, false);
 		++GenerationsCompleted;
 		CheckGenerationCompleted();
 	});
@@ -368,6 +445,13 @@ bool AChunk::CompareMask(const FMask M1, const FMask M2) const
 void AChunk::CreateQuad(FMask Mask, FIntVector AxisMask, int Width, int Height, FIntVector V1, FIntVector V2,
 	FIntVector V3, FIntVector V4, int ZOffset, bool UseHeightMult)
 {
+	if (UseHeightMult)
+    {
+        V1.Z *= HeightMulti; 
+        V2.Z *= HeightMulti; 
+        V3.Z *= HeightMulti; 
+        V4.Z *= HeightMulti; 
+    }
 	const FVector Normal = FVector(AxisMask * Mask.Normal);
 	
 	Vertices.Append({
@@ -376,14 +460,14 @@ void AChunk::CreateQuad(FMask Mask, FIntVector AxisMask, int Width, int Height, 
 		FVector(V3.X, V3.Y, (V3.Z + ZOffset)) * 100,
 		FVector(V4.X, V4.Y, (V4.Z + ZOffset)) * 100,
 	});
-	Triangles.Append({
-		VertexCount,
-		VertexCount + 2 + Mask.Normal,
-		VertexCount + 2 - Mask.Normal,
-		VertexCount + 3,
-		VertexCount + 1 - Mask.Normal,
-		VertexCount + 1 + Mask.Normal
-	});
+  Triangles.Append({
+        VertexCount,
+        VertexCount + 2 + Mask.Normal,
+        VertexCount + 2 - Mask.Normal,
+        VertexCount + 3,
+        VertexCount + 1 - Mask.Normal,
+        VertexCount + 1 + Mask.Normal
+    });
 	Normals.Append({
 		Normal,
 		Normal,
@@ -435,6 +519,183 @@ int AChunk::GetTextureIndex(EBlock BlockType) const
 		case EBlock::Grass: return 0;
 		case EBlock::Dirt: return 1;
 		case EBlock::Stone : return 2;
+		case EBlock::Structure : return 3;
 		default: return 255;
 	}
+}
+
+void AChunk::ModifyMesh(FIntVector Pos, EBlock Block)
+{
+	const int Index = Pos.X + (Pos.Y * Size) + (Pos.Z * Size * Size);
+	UE_LOG(LogTemp, Display, TEXT("ModifyMesh Block %d"), Index);
+	UE_LOG(LogTemp, Display, TEXT("ModifyMesh terrain length %d"), TerrainBlocks.Num());
+	if (!EditCave)
+		if (Index < 0 || Index > TerrainBlocks.Num()) return;
+	else
+		if (Index < 0 || Index > CaveBlocks.Num()) return;
+
+	UE_LOG(LogTemp, Display, TEXT("ModifyMesh Block %d success"), Index);
+	EBlock temp = GetBlock(TerrainBlocks, Pos);
+	switch (temp)
+	{
+		case EBlock::Grass:
+			UE_LOG(LogTemp, Display, TEXT("Grass"));
+		case EBlock::Dirt:
+			UE_LOG(LogTemp, Display, TEXT("Dirt"));
+		case EBlock::Stone:
+			UE_LOG(LogTemp, Display, TEXT("Stone"));
+		case EBlock::Structure:
+			UE_LOG(LogTemp, Display, TEXT("Structure"));
+		case EBlock::Air:
+			UE_LOG(LogTemp, Display, TEXT("Air"));
+
+		default:
+			UE_LOG(LogTemp, Display, TEXT("Unknown"));
+	}
+
+	if (EditCave)
+	{
+		CaveBlocks[Index] = Block;
+		return;
+	}
+	TerrainBlocks[Index] = Block;
+	temp = GetBlock(TerrainBlocks, Pos);
+	switch (temp)
+	{
+		case EBlock::Grass:
+			UE_LOG(LogTemp, Display, TEXT("Grass"));
+		case EBlock::Dirt:
+			UE_LOG(LogTemp, Display, TEXT("Dirt"));
+		case EBlock::Stone:
+			UE_LOG(LogTemp, Display, TEXT("Stone"));
+		case EBlock::Structure:
+			UE_LOG(LogTemp, Display, TEXT("Structure"));
+		case EBlock::Air:
+			UE_LOG(LogTemp, Display, TEXT("Air"));
+
+		default:
+			UE_LOG(LogTemp, Display, TEXT("Unknown"));
+	}
+
+
+	UE_LOG(LogTemp, Error, TEXT("ALL ITEMS"));
+	/*for (EBlock block : TerrainBlocks)
+	{
+	switch (block)
+	{
+		case EBlock::Grass:
+			UE_LOG(LogTemp, Display, TEXT("Grass"));
+		continue;
+		case EBlock::Dirt:
+			UE_LOG(LogTemp, Display, TEXT("Dirt"));
+		continue;
+		case EBlock::Stone:
+			UE_LOG(LogTemp, Display, TEXT("Stone"));
+		continue;
+		case EBlock::Structure:
+			UE_LOG(LogTemp, Display, TEXT("Structure"));
+		continue;
+		case EBlock::Air:
+			UE_LOG(LogTemp, Display, TEXT("Air"));
+		continue;
+
+		default:
+			UE_LOG(LogTemp, Display, TEXT("Unknown"));
+		continue;
+	}
+		
+	}*/
+}
+
+int AChunk::GetBlockIndex(FIntVector Pos)
+{
+    return Pos.X + (Pos.Y * Size) + (Pos.Z * Size * Size);
+	
+	//return Pos.Z * Size * Size + Pos.Y * Size + Pos.X;
+	
+}
+
+void AChunk::ClearMesh()
+{
+	UE_LOG(LogTemp, Display, TEXT("Clearing Mesh"));
+	VertexCount = 0;
+	Vertices.Empty();
+	Triangles.Empty();
+	Normals.Empty();
+	UVData.Empty();
+	Colors.Empty();
+}
+
+void AChunk::ModifyVoxel(FIntVector Pos)
+{
+	UE_LOG(LogTemp, Warning, TEXT("AChunk::ModifyVoxel started"));
+	
+	//if (Pos.X <= Size || Pos.Y <= Size || Pos.X > 0 || Pos.Y > 0) return;
+	
+	UE_LOG(LogTemp, Warning, TEXT("AChunk::ModifyVoxel Success"));
+	VertexCount = 0;
+	Vertices = TArray<FVector>();
+	Triangles = TArray<int32>();
+	Normals = TArray<FVector>();
+	UVData = TArray<FVector2D>();
+	Colors = TArray<FColor>();
+	Mesh->ClearMeshSection(0);
+
+	ModifyMesh(Pos, EBlock::Air);
+
+	GenerateMesh(CaveBlocks, 0, false);
+	GenerateMesh(TerrainBlocks, Size, false);
+
+	ApplyMesh();
+}
+
+FIntVector AChunk::GetBlockPos(FVector pos)
+{
+	FIntVector Result;
+	int factor = Size * 100;
+	FIntVector intPos = FIntVector(pos);
+	
+	if (intPos.X < 0)
+	{
+		Result.X  =  static_cast<int>(pos.X / factor) - 1;
+	}
+	else
+	{
+		Result.X = static_cast<int>(pos.X / factor);
+	}
+
+	if (intPos.Y < 0)
+	{
+		Result.Y  = static_cast<int>(pos.X / factor) - 1;
+	}
+	else
+	{
+		Result.Y = static_cast<int>(pos.Y / factor);
+	}
+	if (intPos.Z < 0)
+	{
+		Result.Z  = static_cast<int>(pos.X / factor) - 1;
+	}
+	else
+	{
+		Result.Z = static_cast<int>(pos.Y / factor);
+	}
+
+	
+	FIntVector Result2 = FIntVector(pos)/100 - Result * Size;
+
+	if (Result.X < 0) Result2.X--;
+	if (Result.Y < 0) Result2.Y--;
+	if (Result.Z < 0) Result2.Z--;
+
+	Result2.Z -= Size;
+
+	if (Result2.Z < 0)
+	{
+		EditCave = true;
+		Result2.Z += Size;
+	}
+
+	
+	return Result2;
 }

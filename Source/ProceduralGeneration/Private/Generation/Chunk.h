@@ -6,8 +6,10 @@
 #include "GameFramework/Actor.h"
 #include "ProceduralMeshComponent.h"
 #include "ProceduralGeneration/BiomesEnum.h"
+#include "ProceduralGeneration/StructurePositions.h"
 #include "Utils/CustomPerlin.h"
 #include "Chunk.generated.h"
+
 
 
 enum class EDirection;
@@ -52,6 +54,9 @@ public:
 	TObjectPtr<UMaterialInterface> Material;
 	
 	EBiome Biome = EBiome::PLanes;
+	TArray<StructureData::FStructurePos> StructurePositions;
+	int TerrainSeed = 1337;
+
 
 private:
 	UPROPERTY()
@@ -69,7 +74,7 @@ private:
 	UPROPERTY()
 	TArray<FVector> Normals;
 
-	CustomPerlin::FNoiseGenerator2D NoiseGenerator2D;
+	CustomPerlin::FNoiseGenerator NoiseGenerator;
 
 	int VertexCount = 0;
 
@@ -116,4 +121,20 @@ private:
 	void CheckGenerationCompleted() const;
 
 	int GetTextureIndex(EBlock BlockType) const;
+	void ModifyMesh(FIntVector Pos, EBlock Block);
+	int GetBlockIndex(FIntVector Pos);
+	void ClearMesh();
+	UFUNCTION(BlueprintCallable)
+	void ModifyVoxel(FIntVector Pos);
+	UFUNCTION(BlueprintCallable)
+	FIntVector GetBlockPos(FVector pos);
+
+private:
+	bool EditCave;
 };
+
+
+
+
+
+

@@ -9,6 +9,8 @@
 
 class AChunk;
 
+
+
 UCLASS()
 class AChunkWorld : public AActor
 {
@@ -27,42 +29,40 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 private:
-	UPROPERTY(EditAnywhere, Category = "Chunk")
+	UPROPERTY(EditAnywhere, Category = "World")
 	int ChunkNumX = 1;
-	UPROPERTY(EditAnywhere, Category = "Chunk")
+	UPROPERTY(EditAnywhere, Category = "World")
 	int ChunkNumY = 1;
-	UPROPERTY(EditAnywhere, Category = "Chunk")
+	UPROPERTY(EditAnywhere, Category = "World")
 	int Size = 32;
-	UPROPERTY(EditAnywhere, Category = "Chunk")
+	UPROPERTY(EditAnywhere, Category = "World")
 	float heightMulti = 1;
-	UPROPERTY(EditAnywhere, Category = "Chunk")
+	UPROPERTY(EditAnywhere, Category = "World")
 	int Scale = 1;
-
+	UPROPERTY(EditAnywhere, Category = "World")
+	int TerrainSeed = 1337;
 	
-	UPROPERTY(EditAnywhere, Category = "Chunk")
+	UPROPERTY(EditAnywhere, Category = "PlanesBiome")
 	float PlaneNoiseFrequency = .008;
-	UPROPERTY(EditAnywhere, Category = "Chunk")
-	float DesertNoiseFrequency = .006;
-	UPROPERTY(EditAnywhere, Category = "Chunk")
-	float SnowNoiseFrequency = .01;
-	UPROPERTY(EditAnywhere, Category = "Chunk")
-	float ForestNoiseFrequency = .02;
-
-	UPROPERTY(EditDefaultsOnly, Category="Chunk")
-	TObjectPtr<UMaterial> DesertMaterial;
-	UPROPERTY(EditDefaultsOnly, Category="Chunk")
+	UPROPERTY(EditDefaultsOnly, Category="PlanesBiome")
 	TObjectPtr<UMaterial> PlaneMaterial;
-	UPROPERTY(EditDefaultsOnly, Category="Chunk")
-	TObjectPtr<UMaterial> ForestMaterial;
-	UPROPERTY(EditDefaultsOnly, Category="Chunk")
+	
+	UPROPERTY(EditAnywhere, Category = "DesertBiome")
+	float DesertNoiseFrequency = .006;
+	UPROPERTY(EditDefaultsOnly, Category="DesertBiome")
+	TObjectPtr<UMaterial> DesertMaterial;
+
+	UPROPERTY(EditAnywhere, Category = "SnowBiome")
+	float SnowNoiseFrequency = .01;
+	UPROPERTY(EditDefaultsOnly, Category="SnowBiome")
 	TObjectPtr<UMaterial> SnowMaterial;
 
-	UFUNCTION()
-	void StartGen(AChunk* chunk, const FTransform& Transform);
+	UPROPERTY(EditAnywhere, Category = "ForestBiome")
+	float ForestNoiseFrequency = .02;
+	UPROPERTY(EditDefaultsOnly, Category="ForestBiome")
+	TObjectPtr<UMaterial> ForestMaterial;
 
-	int32 TestFunc();
 	
-	CustomPerlin::FNoiseGenerator2D BiomeNoiseGenerator;
-	CustomPerlin::FNoiseGenerator2D StructureNoiseGenerator;
+	CustomPerlin::FNoiseGenerator BiomeNoiseGenerator;
 };
 
