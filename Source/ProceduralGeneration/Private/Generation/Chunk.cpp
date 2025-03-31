@@ -695,6 +695,10 @@ FIntVector AChunk::GetBlockPos(FVector pos)
 		EditCave = true;
 		Result2.Z += Size;
 	}
+	else
+	{
+		EditCave = false;
+	}
 
 	
 	return Result2;
