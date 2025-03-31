@@ -14,7 +14,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="14fcaac2-feb1-424c-8609-4270bcc6fd2c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.ProceduralGeneration/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ProceduralGeneration/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Level/TestLevel.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Level/TestLevel.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Player/BP_Player.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Player/BP_Player.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProceduralGeneration.uproject" beforeDir="false" afterPath="$PROJECT_DIR$/ProceduralGeneration.uproject" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ProceduralGeneration/Private/Generation/Chunk.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProceduralGeneration/Private/Generation/Chunk.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ProceduralGeneration/ProceduralGeneration.Build.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ProceduralGeneration/ProceduralGeneration.Build.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,7 +70,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "C++ Project.ProceduralGeneration.executor": "Debug",
+    "C++ Project.ProceduralGeneration.executor": "Run",
     "C/C++ Project.ProceduralGeneration.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -238,7 +243,7 @@
       <workItem from="1743203026867" duration="8252000" />
       <workItem from="1743259423148" duration="63620000" />
       <workItem from="1743369257557" duration="31844000" />
-      <workItem from="1743435719363" duration="140000" />
+      <workItem from="1743435719363" duration="5659000" />
     </task>
     <servers />
   </component>

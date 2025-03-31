@@ -141,7 +141,6 @@ void AChunk::GenerateTerrain()
 
 
 			float structure = FMath::RandRange(0.1, 1.0);
-			//UE_LOG(LogTemp, Warning, TEXT("%f"), structure);
 			
 			if (structure > .999f)
 			{
@@ -526,16 +525,26 @@ int AChunk::GetTextureIndex(EBlock BlockType) const
 
 void AChunk::ModifyMesh(FIntVector Pos, EBlock Block)
 {
+	UE_LOG(LogTemp, Warning, TEXT("The Actor's name is %s"), *GetName());
 	const int Index = Pos.X + (Pos.Y * Size) + (Pos.Z * Size * Size);
-	UE_LOG(LogTemp, Display, TEXT("ModifyMesh Block %d"), Index);
-	UE_LOG(LogTemp, Display, TEXT("ModifyMesh terrain length %d"), TerrainBlocks.Num());
+	//UE_LOG(LogTemp, Display, TEXT("ModifyMesh Block %d"), Index);
+	//UE_LOG(LogTemp, Display, TEXT("ModifyMesh terrain length %d"), TerrainBlocks.Num());
 	if (!EditCave)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Terrain Edit"));
 		if (Index < 0 || Index > TerrainBlocks.Num()) return;
+		TerrainBlocks[Index] = Block;
+	}
 	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Cave Edit"));
 		if (Index < 0 || Index > CaveBlocks.Num()) return;
+		CaveBlocks[Index] = Block;
+		
+	}
 
-	UE_LOG(LogTemp, Display, TEXT("ModifyMesh Block %d success"), Index);
-	EBlock temp = GetBlock(TerrainBlocks, Pos);
+
+	/*EBlock temp = GetBlock(TerrainBlocks, Pos);
 	switch (temp)
 	{
 		case EBlock::Grass:
@@ -552,33 +561,13 @@ void AChunk::ModifyMesh(FIntVector Pos, EBlock Block)
 		default:
 			UE_LOG(LogTemp, Display, TEXT("Unknown"));
 	}
-
 	if (EditCave)
 	{
-		CaveBlocks[Index] = Block;
 		return;
 	}
-	TerrainBlocks[Index] = Block;
-	temp = GetBlock(TerrainBlocks, Pos);
-	switch (temp)
-	{
-		case EBlock::Grass:
-			UE_LOG(LogTemp, Display, TEXT("Grass"));
-		case EBlock::Dirt:
-			UE_LOG(LogTemp, Display, TEXT("Dirt"));
-		case EBlock::Stone:
-			UE_LOG(LogTemp, Display, TEXT("Stone"));
-		case EBlock::Structure:
-			UE_LOG(LogTemp, Display, TEXT("Structure"));
-		case EBlock::Air:
-			UE_LOG(LogTemp, Display, TEXT("Air"));
-
-		default:
-			UE_LOG(LogTemp, Display, TEXT("Unknown"));
-	}
 
 
-	UE_LOG(LogTemp, Error, TEXT("ALL ITEMS"));
+	//UE_LOG(LogTemp, Error, TEXT("ALL ITEMS"));
 	/*for (EBlock block : TerrainBlocks)
 	{
 	switch (block)
@@ -654,6 +643,15 @@ FIntVector AChunk::GetBlockPos(FVector pos)
 	FIntVector Result;
 	int factor = Size * 100;
 	FIntVector intPos = FIntVector(pos);
+	UE_LOG(LogTemp, Warning, TEXT("%d"), intPos.Z/factor);
+	if(intPos.Z/factor < 1)
+	{
+		EditCave = true;
+	}
+	else
+	{
+		EditCave = false;
+	}
 	
 	if (intPos.X < 0)
 	{
@@ -666,7 +664,7 @@ FIntVector AChunk::GetBlockPos(FVector pos)
 
 	if (intPos.Y < 0)
 	{
-		Result.Y  = static_cast<int>(pos.X / factor) - 1;
+		Result.Y  = static_cast<int>(pos.Y / factor) - 1;
 	}
 	else
 	{
@@ -674,32 +672,16 @@ FIntVector AChunk::GetBlockPos(FVector pos)
 	}
 	if (intPos.Z < 0)
 	{
-		Result.Z  = static_cast<int>(pos.X / factor) - 1;
+		UE_LOG(LogTemp, Warning, TEXT("less then 0"));
+		Result.Z  = static_cast<int>(pos.Z / factor) - 1;
 	}
 	else
 	{
-		Result.Z = static_cast<int>(pos.Y / factor);
+		UE_LOG(LogTemp, Warning, TEXT("Greater then 0"));
+		Result.Z = static_cast<int>(pos.Z / factor);
 	}
-
 	
 	FIntVector Result2 = FIntVector(pos)/100 - Result * Size;
 
-	if (Result.X < 0) Result2.X--;
-	if (Result.Y < 0) Result2.Y--;
-	if (Result.Z < 0) Result2.Z--;
-
-	Result2.Z -= Size;
-
-	if (Result2.Z < 0)
-	{
-		EditCave = true;
-		Result2.Z += Size;
-	}
-	else
-	{
-		EditCave = false;
-	}
-
-	
 	return Result2;
 }
