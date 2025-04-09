@@ -1,6 +1,7 @@
 ﻿#pragma once
-//the purpose of this project is education, this is know purely my code.
-//Removed quite a bit of code from this to get what I need and nothing more.
+//the purpose of this project is education, this is not purely my code.
+//Removed quite a bit of code from this to get what I need and nothing more so I can study it.
+//The "FastNoiseLite.h" file contains the full code, or you can find it on github.
 // https://github.com/Auburn/FastNoise
 namespace CustomPerlin
 {
